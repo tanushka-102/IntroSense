@@ -1,4 +1,4 @@
-#IntroSense
+#IntroSense:
 Student Spoken Introduction Evaluator
 ------------------------------------
 A Streamlit app that scores a student's self-introduction transcript using a rubric Excel.
