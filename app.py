@@ -10,8 +10,8 @@ import json
 
 st.set_page_config(page_title="introsense - Student Intro Evaluator", layout="wide")
 
-st.markdown("# 🎓 introsensee")
-st.markdown("**AI-like (rule-based) summary & rubric-based scoring for student introductions.**")
+st.markdown("# 🎓 Introsense")
+st.markdown("**AI-like summary & rubric-based scoring for student introductions**")
 st.markdown("---")
 
 # Default paths
