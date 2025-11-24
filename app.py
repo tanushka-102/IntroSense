@@ -16,7 +16,7 @@ st.markdown("---")
 
 # Default paths
 DEFAULT_RUBRIC_PATH = "/mnt/data/Case study for interns.xlsx"
-DEFAULT_SAMPLE_TRANSCRIPT = "/mnt/data/Sample text for case study.txt"
+DEFAULT_SAMPLE_TRANSCRIPT = "Sample text for case study.txt"
 DEFAULT_CASESTUDY_PDF = "/mnt/data/Nirmaan AI intern Case study instructions.pdf"
 
 st.sidebar.header("Files & Settings")
