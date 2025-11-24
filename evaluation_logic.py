@@ -13,6 +13,9 @@ def load_rubric_from_excel(path: str) -> pd.DataFrame:
     If MaxScore missing, default to 10 per criterion.
     """
     df = pd.read_excel(path)
+    df = df.dropna(how="all")  
+    df = df[df.iloc[:,0].notna()] 
+
     # Normalize column names to lowercase keys mapping
     col_map = {c.lower(): c for c in df.columns}
     def get(colname, default_series):
