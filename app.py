@@ -15,9 +15,9 @@ st.markdown("**AI-like (rule-based) summary & rubric-based scoring for student i
 st.markdown("---")
 
 # Default paths
-DEFAULT_RUBRIC_PATH = "/mnt/data/Case study for interns.xlsx"
+DEFAULT_RUBRIC_PATH = "Case study for interns.xlsx"
 DEFAULT_SAMPLE_TRANSCRIPT = "Sample text for case study.txt"
-DEFAULT_CASESTUDY_PDF = "/mnt/data/Nirmaan AI intern Case study instructions.pdf"
+DEFAULT_CASESTUDY_PDF = "Nirmaan AI intern Case study instructions.pdf"
 
 st.sidebar.header("Files & Settings")
 rubric_path = st.sidebar.text_input("Rubric Excel path", value=DEFAULT_RUBRIC_PATH)
