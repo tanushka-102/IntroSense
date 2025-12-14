@@ -22,7 +22,7 @@ DEFAULT_CASESTUDY_PDF = "Nirmaan AI intern Case study instructions.pdf"
 st.sidebar.header("Files & Settings")
 rubric_path = st.sidebar.text_input("Rubric Excel path", value=DEFAULT_RUBRIC_PATH)
 use_sample = st.sidebar.checkbox("Use uploaded sample transcript", value=True)
-show_json = st.sidebar.checkbox("Show JSON output", value=True)
+show_json = st.sidebar.checkbox("Show JSON output (developer view)", value=False)
 
 st.header("Input Transcript")
 if use_sample:
