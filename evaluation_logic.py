@@ -7,55 +7,49 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 
 def load_rubric_from_excel(path: str) -> pd.DataFrame:
-    df = pd.read_excel(path, header=0)
+    """
+    The provided Excel is instructional, not a structured rubric.
+    So we define a default evaluation rubric aligned with the case study.
+    """
 
-    # Remove completely empty rows
-    df = df.dropna(how="all")
-
-    # Rename columns safely
-    df.columns = [str(c).strip().lower() for c in df.columns]
-
-    # If only ONE column exists, treat it as criterion
-    if len(df.columns) == 1:
-        rubric = pd.DataFrame({
-            "criterion": df.iloc[:, 0].astype(str),
-            "description": "",
+    rubric = pd.DataFrame([
+        {
+            "criterion": "Clarity",
+            "description": "How clearly the student introduces themselves",
             "keywords": "",
             "weight": 1.0,
-            "minwords": 0,
-            "maxwords": 1e9,
+            "minwords": 50,
+            "maxwords": 300,
             "max_score": 10
-        })
-        return rubric
-
-    # Try to detect columns
-    def find_col(names):
-        for n in names:
-            for c in df.columns:
-                if n in c:
-                    return c
-        return None
-
-    crit_col = find_col(["criterion", "criteria", "parameter", "aspect"])
-    desc_col = find_col(["description", "details", "what"])
-    score_col = find_col(["marks", "score", "max"])
-
-    if crit_col is None:
-        # fallback: first column
-        crit_col = df.columns[0]
-
-    rubric = pd.DataFrame()
-    rubric["criterion"] = df[crit_col].astype(str)
-    rubric["description"] = df[desc_col] if desc_col else ""
-    rubric["keywords"] = ""
-    rubric["weight"] = 1.0
-    rubric["minwords"] = 0
-    rubric["maxwords"] = 1e9
-    rubric["max_score"] = df[score_col] if score_col else 10
-
-    # Remove junk rows
-    rubric = rubric[rubric["criterion"].str.strip() != ""]
-    rubric = rubric[rubric["criterion"].str.lower() != "nan"]
+        },
+        {
+            "criterion": "Structure",
+            "description": "Logical flow from introduction to conclusion",
+            "keywords": "",
+            "weight": 1.0,
+            "minwords": 50,
+            "maxwords": 300,
+            "max_score": 10
+        },
+        {
+            "criterion": "Content Coverage",
+            "description": "Mentions background, interests, and goals",
+            "keywords": "",
+            "weight": 1.0,
+            "minwords": 50,
+            "maxwords": 300,
+            "max_score": 10
+        },
+        {
+            "criterion": "Language Quality",
+            "description": "Grammar, vocabulary, and sentence formation",
+            "keywords": "",
+            "weight": 1.0,
+            "minwords": 50,
+            "maxwords": 300,
+            "max_score": 10
+        }
+    ])
 
     return rubric
 
