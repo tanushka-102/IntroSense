@@ -7,33 +7,42 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 
 def load_rubric_from_excel(path: str) -> pd.DataFrame:
-    """
-    Load rubric Excel and normalize expected columns.
-    Expected columns (case-insensitive): Criterion, Description, Keywords, Weight, MinWords, MaxWords, MaxScore
-    If MaxScore missing, default to 10 per criterion.
-    """
     df = pd.read_excel(path)
-    df = df.dropna(how="all")  
-    df = df[df.iloc[:,0].notna()] 
 
-    # Normalize column names to lowercase keys mapping
-    col_map = {c.lower(): c for c in df.columns}
-    def get(colname, default_series):
-        return df[col_map[colname]] if colname in col_map else default_series
+    # ✅ Remove completely empty rows
+    df = df.dropna(how="all")
 
-    n = len(df)
+    # ✅ Strip column names
+    df.columns = [str(c).strip().lower() for c in df.columns]
+
+    # ✅ Identify columns dynamically (works with your Excel)
+    def find_col(possible_names):
+        for name in possible_names:
+            if name in df.columns:
+                return name
+        return None
+
+    col_criterion = find_col(["criterion", "criteria", "parameter", "aspect"])
+    col_description = find_col(["description", "details", "what to check", "explanation"])
+    col_score = find_col(["marks", "score", "max score", "maximum marks"])
+
+    if col_criterion is None or col_score is None:
+        raise ValueError("Could not identify rubric columns. Check Excel headers.")
+
     rubric = pd.DataFrame()
-    rubric['criterion'] = get('criterion', df.iloc[:,0])
-    rubric['description'] = get('description', pd.Series([""]*n))
-    rubric['keywords'] = get('keywords', pd.Series([""]*n)).fillna("")
-    rubric['weight'] = get('weight', pd.Series([1.0]*n)).fillna(1.0).astype(float)
-    rubric['minwords'] = get('minwords', pd.Series([0]*n)).fillna(0).astype(float)
-    rubric['maxwords'] = get('maxwords', pd.Series([1e9]*n)).fillna(1e9).astype(float)
-    rubric['max_score'] = get('maxscore', pd.Series([10]*n)).fillna(10).astype(float)
-    # fallback if different naming like Max Score, Max_Score etc.
-    if 'max_score' not in rubric:
-        rubric['max_score'] = 10
+    rubric["criterion"] = df[col_criterion]
+    rubric["description"] = df[col_description] if col_description else ""
+    rubric["keywords"] = ""
+    rubric["weight"] = 1.0
+    rubric["minwords"] = 0
+    rubric["maxwords"] = 1e9
+    rubric["max_score"] = df[col_score]
+
+    # Remove rows where criterion is still empty
+    rubric = rubric[rubric["criterion"].notna()]
+
     return rubric
+
 
 def tokenize(text: str) -> List[str]:
     return re.findall(r"\b\w+\b", text.lower())
