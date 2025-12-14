@@ -7,39 +7,55 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 
 def load_rubric_from_excel(path: str) -> pd.DataFrame:
-    df = pd.read_excel(path)
+    df = pd.read_excel(path, header=0)
 
-    # ✅ Remove completely empty rows
+    # Remove completely empty rows
     df = df.dropna(how="all")
 
-    # ✅ Strip column names
+    # Rename columns safely
     df.columns = [str(c).strip().lower() for c in df.columns]
 
-    # ✅ Identify columns dynamically (works with your Excel)
-    def find_col(possible_names):
-        for name in possible_names:
-            if name in df.columns:
-                return name
+    # If only ONE column exists, treat it as criterion
+    if len(df.columns) == 1:
+        rubric = pd.DataFrame({
+            "criterion": df.iloc[:, 0].astype(str),
+            "description": "",
+            "keywords": "",
+            "weight": 1.0,
+            "minwords": 0,
+            "maxwords": 1e9,
+            "max_score": 10
+        })
+        return rubric
+
+    # Try to detect columns
+    def find_col(names):
+        for n in names:
+            for c in df.columns:
+                if n in c:
+                    return c
         return None
 
-    col_criterion = find_col(["criterion", "criteria", "parameter", "aspect"])
-    col_description = find_col(["description", "details", "what to check", "explanation"])
-    col_score = find_col(["marks", "score", "max score", "maximum marks"])
+    crit_col = find_col(["criterion", "criteria", "parameter", "aspect"])
+    desc_col = find_col(["description", "details", "what"])
+    score_col = find_col(["marks", "score", "max"])
 
-    if col_criterion is None or col_score is None:
-        raise ValueError("Could not identify rubric columns. Check Excel headers.")
+    if crit_col is None:
+        # fallback: first column
+        crit_col = df.columns[0]
 
     rubric = pd.DataFrame()
-    rubric["criterion"] = df[col_criterion]
-    rubric["description"] = df[col_description] if col_description else ""
+    rubric["criterion"] = df[crit_col].astype(str)
+    rubric["description"] = df[desc_col] if desc_col else ""
     rubric["keywords"] = ""
     rubric["weight"] = 1.0
     rubric["minwords"] = 0
     rubric["maxwords"] = 1e9
-    rubric["max_score"] = df[col_score]
+    rubric["max_score"] = df[score_col] if score_col else 10
 
-    # Remove rows where criterion is still empty
-    rubric = rubric[rubric["criterion"].notna()]
+    # Remove junk rows
+    rubric = rubric[rubric["criterion"].str.strip() != ""]
+    rubric = rubric[rubric["criterion"].str.lower() != "nan"]
 
     return rubric
 
